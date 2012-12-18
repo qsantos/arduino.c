@@ -11,10 +11,10 @@ PORT     = /dev/ttyACM0
 # WARNING: do not use "."
 #          make clean / make destroy would wipe it out
 #          it is safe to choose any unused directory (e.g. ./obj)
-LIB_OBJ = ../core
+LIB_OBJ = ../obj
+# location of the arduino.c folder
+LIB_C    = ../arduino.c
 
-# gain some bytes in the final program
-#MODE=minimal
 # allow classic Arduino C++ with libraries
 #MODE=cpp
 
@@ -37,6 +37,7 @@ LIB_VAR  = $(ARD_BASE)/hardware/arduino/variants/$(VARIANT)
 ifeq ($(MODE),cpp)
 LIB_ARD  = $(ARD_BASE)/libraries
 INC_PATH = $(LIB_CORE) $(LIB_VAR) $(wildcard $(LIB_ARD)/*)
+LIB_C    =
 else
 LIB_ARD  =
 INC_PATH = $(LIB_CORE) $(LIB_VAR)
@@ -60,14 +61,11 @@ OFILES = $(SFILES:.S=.o) $(CFILES:.c=.o) $(XFILES:.cpp=.o) $(IFILES:.ino=.o)
 
 # LIST CORE AND LIBRARY SOURCE FILES
 # the %P format strips the root path
-ifeq ($(MODE),minimal)
-CLIB = wiring.c wiring_digital.c
-XLIB =
-else ifeq ($(MODE), cpp)
+ifeq ($(MODE), cpp)
 CLIB = $(shell find $(LIB_CORE) $(LIB_ARD) -name "*.c"   -printf "%P\n")
 XLIB = $(shell find $(LIB_CORE) $(LIB_ARD) -name "*.cpp" -printf "%P\n")
 else
-CLIB = $(shell find $(LIB_CORE) $(LIB_ARD) -name "*.c"   -printf "%P\n")
+CLIB = $(shell find $(LIB_CORE) $(LIB_C) $(LIB_ARD) -name "*.c"   -printf "%P\n")
 XLIB =
 endif
 OLIB = $(addprefix $(LIB_OBJ)/, $(CLIB:.c=.o) $(XLIB:.cpp=.o))
@@ -94,7 +92,7 @@ all: $(TARGET).hex
 ifeq ($(MODE),cpp)
 	@(echo "#include <Arduino.h>"; cat $<) | $(CC) $(ARD_OPT) $(XFLAGS) -x c++ -c - -o $@
 else
-	@(echo "#include <Arduino.h>"; cat $<; echo "int main(){init();setup();for(;;)loop();}ISR(USB_GEN_vect){UDINT=0;}") | $(CC) $(ARD_OPT) $(CFLAGS) -x c -c - -o $@
+	@(echo "#include <Arduino.h>"; cat $<) | $(CC) $(ARD_OPT) $(CFLAGS) -x c -c - -o $@
 endif
 
 # CORE LIBRARY
@@ -107,6 +105,12 @@ $(LIB_OBJ)/%.o: $(LIB_CORE)/%.cpp
 	@echo $@
 	@mkdir -p $(@D)
 	@$(CC) $(ARD_OPT) $(XFLAGS) -c $< -o $@
+
+# ARDUINO.C LIBRARY
+$(LIB_OBJ)/%.o: $(LIB_C)/%.c
+	@echo $@
+	@mkdir -p $(@D)
+	@$(CC) $(ARD_OPT) $(CFLAGS) -I $(<D) -c $< -o $@
 
 # OTHER LIBRARIES
 # the -I options are hacks to fix invalid inclusion directives
@@ -131,8 +135,8 @@ $(TARGET).hex: $(OFILES) $(OLIB)
 # the 'stty' call reset Leonardo and derivative by using the magic baudrate (1200)
 upload: $(TARGET).hex
 	@echo "Uploading..."
-#	stty -F $(PORT) 1200 cs8 -cstopb -parenb
-#	sleep 4
+	@stty -F $(PORT) 1200 cs8 -cstopb -parenb
+	@sleep 1
 	@avrdude -D -p $(MCU) -c $(PROTOCOL) -P $(PORT) -U flash:w:$<:i
 
 clean:
