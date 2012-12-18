@@ -33,11 +33,14 @@ I am used to making an alias such as:
 alias mak='make -f ../arduino.c/Makefile'
 
 (to be put in your ~/.bashrc)
-
 But, if you prefer, you can just copy the Makefile in your copy directory.
-
 In either case, I'll write 'make' but you should use 'mak' if you use the same alias.
 
+
+If you want to compile C++ Arduino project (like the Arduino IDE does), you should add " MODE=cpp" to every call to the 'make' command. If you prefer, you can just uncomment the appropriate line in the Makefile.
+
+
+The Makefile support the following commands:
   * make           see 'make all'
   * make all       build the .hex file to be sent to the board
   * make clean     remove the project object files (*.o)
