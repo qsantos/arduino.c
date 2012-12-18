@@ -1,0 +1,47 @@
+== DESCRIPTION ==
+
+
+arduino.c comes in two parts: a Makefile and C files.
+
+With only the Makefile, you should be able to:
+  * compile any C++ Arduino project (with or without *.ino files)
+  * compile a pure C Arduino project without library or Serial access (no /dev/ttyACM0 during execution)
+
+With the Makefile and the C files, you should be able to:
+  * compile a pure C Arduino project without library, but there should be a /dev/ttyACM0 (allowing autoreset for upload)
+
+
+== INSTALLATION ==
+
+First, configure the Makefile by setting the following variables to a correct value:
+
+  * VAR      (preset value)        description
+
+  * TARGET   (program)             the basename of the file to be created (here, program.hex)
+  * BOARD    (leonardo)            the identifier of the board
+  * ARD_BASE (/usr/share/arduino)  the installation path of arduino
+                                   (sources work as well, given that there are hardware/ and core/ in it)
+  * PORT     (/dev/ttyACM0)        the file pointing to the Serial connection
+  * LIB_OBJ  (../obj)              the directory where the object files should be created (e.g. /tmp/xyz)
+  * LIB_C    (../arduino.c)        the directory where the sources for arduino.c are found
+                                   (i.e. the location of CDC_c.c, HID_c.c, main_c.c, USB.c and USB.h)
+
+== USAGE ==
+
+I am used to making an alias such as:
+
+alias mak='make -f ~/coding/arduino/arduino.c/Makefile'
+
+(to be put in your ~/.bashrc)
+
+But, if you prefer, you can just copy the Makefile in your copy directory.
+
+In either case, I'll write 'make' but you should use 'mak' if you use the same alias.
+
+  * make           see 'make all'
+  * make all       build the .hex file to be sent to the board
+  * make clean     remove the project object files (*.o)
+  * make cleanobj  remove the global (Arduino Core, libraries, arduino.c) object files (../obj)
+  * make destroy   same as 'make clean' and remove the .hex file
+  * make rebuild   same as 'make destroy all' (i.e. purge and build everything again)
+  * make upload    same as 'make all' and upload the .hex file to the board (reset it if possible)

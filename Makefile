@@ -142,7 +142,7 @@ upload: $(TARGET).hex
 clean:
 	rm -f *.o
 
-cleancore:
+cleanobj:
 	rm -Rf $(LIB_OBJ)
 
 destroy: clean
