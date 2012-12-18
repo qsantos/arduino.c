@@ -30,7 +30,7 @@ First, configure the Makefile by setting the following variables to a correct va
 
 I am used to making an alias such as:
 
-alias mak='make -f ~/coding/arduino/arduino.c/Makefile'
+alias mak='make -f ../arduino.c/Makefile'
 
 (to be put in your ~/.bashrc)
 
