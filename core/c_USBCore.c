@@ -18,7 +18,7 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 
-#include "USB.h"
+#include "c_USB.h"
 
 #if defined(USBCON)
 

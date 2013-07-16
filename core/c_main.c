@@ -18,7 +18,7 @@
 
 #include <Arduino.h>
 
-#include "USB.h"
+#include "c_USB.h"
 
 void setup();
 void loop();

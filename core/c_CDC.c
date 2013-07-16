@@ -14,7 +14,7 @@
 ** SOFTWARE.
 */
 
-#include "USB.h"
+#include "c_USB.h"
 
 #include <avr/wdt.h>
 

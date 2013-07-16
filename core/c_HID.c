@@ -14,7 +14,7 @@
 ** SOFTWARE.
 */
 
-#include "USB.h"
+#include "c_USB.h"
 
 #if defined(USBCON)
 #ifdef HID_ENABLED
