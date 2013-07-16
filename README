@@ -34,6 +34,8 @@ PORT     /dev/ttyACM0        file pointing to the serial connection
 LIB_OBJ  $(BASE_PATH)/obj    building directory for C core (e.g. /tmp/xyz)
 LIB_C    $(BASE_PATH)/core   source directory for C core (c_*.c)
 
+Note: $(BASE_PATH) is the directory where the Makefile is located
+
 If you want to compile C++ Arduino project (like the Arduino IDE does),
 you should add " MODE=cpp" to every call to the 'make' command. If you
 prefer, you can just uncomment the appropriate line in the Makefile.
