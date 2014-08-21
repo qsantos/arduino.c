@@ -16,9 +16,11 @@ This package contains:
 * C core files: porting of a part of the C++ Arduino core for serial
   communications.
 * examples:
+ * **blink:** see http://arduino.cc/en/Tutorial/Blink
  * **bargraph:** see http://arduino.cc/en/Tutorial/BarGraph
- * **2digits:** implements a two digit counter using two 7 segment displays
-   and a single shift register (serial to parallel)
+ * **digit:** controls a single 7 segment display
+ * **shift:** same, through a shift register (serial to parallel)
+
 
 
 Set up
