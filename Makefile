@@ -5,9 +5,6 @@ ifeq ($(BASE_PATH),)
 endif
 BASE_PATH:=$(shell dirname $(BASE_PATH))
 
-
-
-
 # BUILDING OPTIONS (CHANGE THIS IF NEEDED)
 # the files to create
 TARGET   := program
@@ -28,30 +25,11 @@ LIB_C    := $(BASE_PATH)/core
 #MODE:=cpp
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # =============================
 # =                           =
 # =    = GATHERING INFOS =    =
 # =                           =
 # =============================
-
 
 # TARGET CONFIGURATION
 CONF     := $(ARD_BASE)/hardware/arduino/boards.txt
@@ -66,9 +44,6 @@ CORE     := $(shell grep '^$(BOARD).build.core='      $(CONF) | cut -d'=' -f2)
 # in the first line of src_complete/todo.txt
 REVISION := 0101
 
-
-
-
 # ARDUINO FILES (CORE, CORE VARIANT, LIBRARIES)
 LIB_CORE := $(ARD_BASE)/hardware/arduino/cores/$(CORE)
 LIB_VAR  := $(ARD_BASE)/hardware/arduino/variants/$(VARIANT)
@@ -81,9 +56,6 @@ LIB_ARD  :=
 INC_PATH := $(LIB_CORE) $(LIB_VAR)
 endif
 
-
-
-
 # COMPILATION AND LINKING FLAGS
 CC      := avr-gcc
 ARD_OPT := -mmcu=$(MCU) -DF_CPU=$(F_CPU) -DUSB_VID=$(VID) -DUSB_PID=$(PID) -DARDUINO=$(REVISION)
@@ -93,18 +65,12 @@ CFLAGS  := $(FLAGS) -ffunction-sections -fdata-sections -std=c99
 XFLAGS  := $(FLAGS) -ffunction-sections -fdata-sections -fno-exceptions
 LDFLAGS := -Os -Wl,--gc-sections
 
-
-
-
 # LIST PROJECT SOURCE FILES AND CORRESPONDING OBJ FILES
 SFILES := $(wildcard *.S)
 CFILES := $(wildcard *.c)
 XFILES := $(wildcard *.cpp)
 IFILES := $(wildcard *.ino)
 OFILES := $(SFILES:.S=.o) $(CFILES:.c=.o) $(XFILES:.cpp=.o) $(IFILES:.ino=.o)
-
-
-
 
 # LIST CORE AND LIBRARY SOURCE FILES
 # the %P format strips the root path
@@ -118,25 +84,6 @@ endif
 OLIB := $(addprefix $(LIB_OBJ)/, $(CLIB:.c=.o) $(XLIB:.cpp=.o))
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # =============================
 # =                           =
 # =    = ACTUAL BUILDING =    =
@@ -145,9 +92,6 @@ OLIB := $(addprefix $(LIB_OBJ)/, $(CLIB:.c=.o) $(XLIB:.cpp=.o))
 
 # basic target
 all: $(TARGET).hex
-
-
-
 
 # PROJECT FILES
 %.o: %.S
@@ -162,9 +106,6 @@ all: $(TARGET).hex
 	@echo $@
 	@$(CC) $(ARD_OPT) $(XFLAGS) -c $< -o $@
 
-
-
-
 # .ino files are compiled either as C or C++ files, depending on the mode
 # the adequate include and main code are added
 %.o: %.ino
@@ -174,9 +115,6 @@ ifeq ($(MODE),cpp)
 else
 	@(echo "#include <Arduino.h>"; cat $<) | $(CC) $(ARD_OPT) $(CFLAGS) -x c -c - -o $@
 endif
-
-
-
 
 # CORE LIBRARY
 $(LIB_OBJ)/%.o: $(LIB_CORE)/%.c
@@ -189,17 +127,11 @@ $(LIB_OBJ)/%.o: $(LIB_CORE)/%.cpp
 	@mkdir -p $(@D)
 	@$(CC) $(ARD_OPT) $(XFLAGS) -c $< -o $@
 
-
-
-
 # ARDUINO.C LIBRARY
 $(LIB_OBJ)/%.o: $(LIB_C)/%.c
 	@echo $@
 	@mkdir -p $(@D)
 	@$(CC) $(ARD_OPT) $(CFLAGS) -I $(<D) -c $< -o $@
-
-
-
 
 # OTHER LIBRARIES
 # the -I options are hacks to fix invalid inclusion directives
@@ -213,18 +145,12 @@ $(LIB_OBJ)/%.o: $(LIB_ARD)/%.cpp
 	@mkdir -p $(@D)
 	$(CC) $(ARD_OPT) $(XFLAGS) -I $(<D) -I $(<D)/utility -c $< -o $@
 
-
-
-
 # LINK OBJ FILES AND FILTER ADEQUATE SECTIONS
 $(TARGET).hex: $(OFILES) $(OLIB)
 	@echo $@
 	@$(CC) $(ARD_OPT) $(LDFLAGS) $^ -o $(TARGET).elf
 	@avr-objcopy -O ihex -j .text -j .data $(TARGET).elf $@
 	@rm $(TARGET).elf
-
-
-
 
 # UPLOAD PROGRAM TO CHIP
 # the 'stty' call reset Leonardo and derivative by using the magic baudrate (1200)
@@ -234,7 +160,6 @@ upload: $(TARGET).hex
 	@sleep 1
 	@stty -F $(PORT) 9600
 	@avrdude -D -b 9600 -p $(MCU) -c $(PROTOCOL) -P $(PORT) -U flash:w:$<:i
-
 
 # OTHER TARGETS
 clean:
