@@ -56,10 +56,11 @@ endif
 # COMPILATION AND LINKING FLAGS
 CC      := avr-gcc
 ARD_OPT := -mmcu=$(MCU) -DF_CPU=$(F_CPU) -DUSB_VID=$(VID) -DUSB_PID=$(PID) -DARDUINO=$(REVISION)
-FLAGS   := -Wall -Wextra -pedantic -ansi -Os $(addprefix -I, $(INC_PATH))
-SFLAGS  := $(FLAGS)
-CFLAGS  := $(FLAGS) -ffunction-sections -fdata-sections -std=c99
-XFLAGS  := $(FLAGS) -ffunction-sections -fdata-sections -fno-exceptions
+FLAGS   := -Wall -Wextra -pedantic -Wpedantic -Wformat -Wshadow -Wconversion -Os
+CPPFLAGS:= $(addprefix -I, $(INC_PATH))
+SFLAGS  := $(CPPFLAGS) $(FLAGS)
+CFLAGS  := $(CPPFLAGS) $(FLAGS) -ffunction-sections -fdata-sections -std=c99
+XFLAGS  := $(CPPFLAGS) $(FLAGS) -ffunction-sections -fdata-sections -fno-exceptions
 LDFLAGS := -Os -Wl,--gc-sections
 
 # DISCOVER PROJECT SOURCE FILES AND GENERATE OBJ TARGETS
