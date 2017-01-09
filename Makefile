@@ -247,3 +247,5 @@ destroy: clean
 	rm -f $(TARGET).hex
 
 rebuild: destroy all
+
+.PHONY: all upload clean cleanobj destroy rebuild
