@@ -230,9 +230,10 @@ $(TARGET).hex: $(OFILES) $(OLIB)
 # the 'stty' call reset Leonardo and derivative by using the magic baudrate (1200)
 upload: $(TARGET).hex
 	@echo "Uploading..."
-	@stty -F $(PORT) 1200 cs8 -cstopb -parenb
+	@stty -F $(PORT) 1200 raw ignbrk hup
 	@sleep 1
-	@avrdude -D -p $(MCU) -c $(PROTOCOL) -P $(PORT) -U flash:w:$<:i
+	@stty -F $(PORT) 9600
+	@avrdude -D -b 9600 -p $(MCU) -c $(PROTOCOL) -P $(PORT) -U flash:w:$<:i
 
 
 # OTHER TARGETS
