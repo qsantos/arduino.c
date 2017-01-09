@@ -6,32 +6,29 @@ endif
 BASE_PATH:=$(shell dirname $(BASE_PATH))
 
 # BUILDING OPTIONS (CHANGE THIS IF NEEDED)
-# the files to create
+# the names of the files to create
 TARGET   := program
-# the ide:ntifier of the board
+# the identifier of the board
 BOARD    := leonardo
-# the ard:uino installation directory
+# the Arduino installation directory
 ARD_BASE := /usr/share/arduino
-# the ser:ial port the board is connected to
+# the serial port the board is connected to
 PORT     := /dev/ttyACM0
-# building directory for arduino core and libs
-# WARNING: do not use "."
-#          make clean / make destroy would wipe it out
-#          it is safe to choose any unused directory (e.g. ./obj)
+# building directory for Arduino core and libs
+# WARNING: choose an unused directory (not the project directory)
+#          clean and destroy targets will delete it
 LIB_OBJ  := $(BASE_PATH)/obj
-# location of the arduino.c folder
+# location of the arduino.c folder (port of some features to C)
 LIB_C    := $(BASE_PATH)/core
-# allow classic Arduino C++ with libraries
+# use official Arduino C++ libraries
 #MODE:=cpp
 
 
 # =============================
-# =                           =
-# =    = GATHERING INFOS =    =
-# =                           =
+#      GATHER VARIOUS INFO
 # =============================
 
-# TARGET CONFIGURATION
+# CONFIGURATION FOR TARGET
 CONF     := $(ARD_BASE)/hardware/arduino/boards.txt
 NAME     := $(shell grep '^$(BOARD).name='            $(CONF) | cut -d'=' -f2)
 PROTOCOL := $(shell grep '^$(BOARD).upload.protocol=' $(CONF) | cut -d'=' -f2)
@@ -65,14 +62,14 @@ CFLAGS  := $(FLAGS) -ffunction-sections -fdata-sections -std=c99
 XFLAGS  := $(FLAGS) -ffunction-sections -fdata-sections -fno-exceptions
 LDFLAGS := -Os -Wl,--gc-sections
 
-# LIST PROJECT SOURCE FILES AND CORRESPONDING OBJ FILES
+# DISCOVER PROJECT SOURCE FILES AND GENERATE OBJ TARGETS
 SFILES := $(wildcard *.S)
 CFILES := $(wildcard *.c)
 XFILES := $(wildcard *.cpp)
 IFILES := $(wildcard *.ino)
 OFILES := $(SFILES:.S=.o) $(CFILES:.c=.o) $(XFILES:.cpp=.o) $(IFILES:.ino=.o)
 
-# LIST CORE AND LIBRARY SOURCE FILES
+# DISCOVER CORE AND LIBRARY SOURCE FILES
 # the %P format strips the root path
 ifeq ($(MODE), cpp)
 CLIB := $(shell find $(LIB_CORE) $(LIB_ARD) -name "*.c"   -printf "%P\n")
@@ -84,13 +81,11 @@ endif
 OLIB := $(addprefix $(LIB_OBJ)/, $(CLIB:.c=.o) $(XLIB:.cpp=.o))
 
 
-# =============================
-# =                           =
-# =    = ACTUAL BUILDING =    =
-# =                           =
-# =============================
+# =========================
+#      ACTUAL BUILDING
+# =========================
 
-# basic target
+# default target
 all: $(TARGET).hex
 
 # PROJECT FILES
@@ -153,7 +148,7 @@ $(TARGET).hex: $(OFILES) $(OLIB)
 	@rm $(TARGET).elf
 
 # UPLOAD PROGRAM TO CHIP
-# the 'stty' call reset Leonardo and derivative by using the magic baudrate (1200)
+# the 'stty' call resets the Leonardo by using the magic baudrate (1200)
 upload: $(TARGET).hex
 	@echo "Uploading..."
 	@stty -F $(PORT) 1200 raw ignbrk hup
@@ -161,7 +156,7 @@ upload: $(TARGET).hex
 	@stty -F $(PORT) 9600
 	@avrdude -D -b 9600 -p $(MCU) -c $(PROTOCOL) -P $(PORT) -U flash:w:$<:i
 
-# OTHER TARGETS
+# USEFUL PHONY TARGETS
 clean:
 	rm -f *.o
 
