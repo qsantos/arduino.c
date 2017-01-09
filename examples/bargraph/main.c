@@ -1,7 +1,7 @@
 #include <Arduino.h>
 
-char DS = 0;
-char CP = 1;
+uint8_t DS = 0;
+uint8_t CP = 1;
 
 void setup()
 {
@@ -9,17 +9,19 @@ void setup()
 	pinMode(CP, OUTPUT);
 }
 
-void pushBit(char bit)
+void pushBit(int bit)
 {
 	digitalWrite(DS, bit ? HIGH : LOW);
 	digitalWrite(CP, HIGH);
 	digitalWrite(CP, LOW);
 }
 
-void pushBits(int word, int len)
+void pushBits(int bits, int len)
 {
-	for (; len; len--, word >>= 1)
-		pushBit(word%2);
+	for (int i = 0; i < len; i += 1)
+	{
+		pushBit((bits >> i) & 1);
+	}
 }
 
 void loop()
